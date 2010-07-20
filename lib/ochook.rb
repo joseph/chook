@@ -69,7 +69,11 @@ module Chook
 
     def metadata(name)
       doc = parse_document
-      doc.at_css("meta[name=#{name}]")['content']
+      if node = doc.at_css("meta[name=#{name}]")
+        node['content']
+      else
+        nil
+      end
     end
 
 
