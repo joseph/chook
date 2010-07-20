@@ -93,7 +93,7 @@ __END__
 
 @@ read
 <!DOCTYPE html>
-<html>
+<html manifest="<%= @ook.public_path(@ook.id, "ochook.manifest") %>">
   <head>
     <title><%= @ook.metadata('title') %></title>
     <meta name="viewport"

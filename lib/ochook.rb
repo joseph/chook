@@ -41,7 +41,6 @@ module Chook
        `unzip #{path} -d #{system_path}`
       raise "Not a zip file"  unless $?.success?
 
-      # Validate it.
       unless File.exists?(system_path(@id, "index.html"))
         raise "index.html not found"
       end
@@ -50,22 +49,21 @@ module Chook
         raise "cover.png not found"
       end
 
-      # Generate the ochook.manifest file
       generate_manifest
 
-      # Update the Index file to reference the manifest
       insert_manifest_attribute
     rescue => e
       self.invalidity = e
     end
 
 
-    def system_path(id = @id, contd = [])
-      contd = [contd].flatten.compact
-      contd.unshift(id)
-      contd.unshift("books")
-      contd.unshift("public")
-      File.join(*contd)
+    def system_path(id = @id, *args)
+      pave('public', 'books', id, args)
+    end
+
+
+    def public_path(id = @id, *args)
+      "/#{pave('books', id, args)}/"
     end
 
 
@@ -115,9 +113,9 @@ module Chook
 
 
       def generate_manifest
-        manifest = ["CACHE MANIFEST", "NETWORK:", "*", "CACHE:"]
+        manifest = ["CACHE MANIFEST", "NETWORK:", "*", "CACHE:", "/read/#{@id}/"]
         Dir.glob(File.join(system_path, "**", "*")).each { |path|
-          manifest << path.gsub(system_path(''), '')
+          manifest << path.gsub(/^public/, '')
         }
         File.open(system_path(@id, "ochook.manifest"), 'w') { |f|
           f.write(manifest.join("\n"))
@@ -139,6 +137,12 @@ module Chook
         File.open(system_path(@id, "index.html"), 'r') { |f|
           return @doc = Nokogiri::HTML::Document.parse(f)
         }
+      end
+
+
+      # A simple File.join shortcut
+      def pave(*args)
+        File.join(*(args.flatten.compact))
       end
 
   end
