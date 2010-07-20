@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= @ook.metadata('title') %></title>
+    <style type="text/css">
+      img {
+        position: absolute;
+      }
+      iframe {
+        position: absolute;
+        display: none;
+      }
+    </style>
+    <script type="text/javascript">
+      function read() {
+        var cover = document.getElementById('cover');
+        var frame = document.getElementById('reader');
+        frame.style.width = cover.offsetWidth + "px";
+        frame.style.height = cover.offsetHeight + "px";
+        cover.style.display = "none";
+        frame.style.display = "block";
+      }
+    </script>
+  </head>
+  <body>
+    <img id="cover" src="/books/<%= @id %>/cover.png" onclick="read()" />
+    <iframe id="reader" src="/books/<%= @id %>/index.html" />
+  </body>
+</html>

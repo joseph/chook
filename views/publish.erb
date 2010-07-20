@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Publish an Ochook</title>
+  </head>
+  <body>
+    <h1>Publish an Ochook</h1>
+    <form action="/publish" method="POST" enctype="multipart/form-data">
+      <fieldset>
+        <legend>Upload a Zhook</legend>
+        <p>
+          <input type="file" name="file" />
+        </p>
+        <p>
+          <label>Secure URL?
+            <input type="checkbox" name="secure" />
+          </label>
+        </p>
+        <p>
+          <input type="submit" value="Publish" />
+        </p>
+      </fieldset>
+    </form>
+  </body>
+</html>
