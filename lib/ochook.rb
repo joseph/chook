@@ -63,7 +63,7 @@ module Chook
 
 
     def public_path(id = @id, *args)
-      "/#{pave('books', id, args)}/"
+      "/#{pave('books', id, args)}"
     end
 
 
@@ -115,7 +115,7 @@ module Chook
       def generate_manifest
         manifest = ["CACHE MANIFEST", "NETWORK:", "*", "CACHE:", "/read/#{@id}/"]
         Dir.glob(File.join(system_path, "**", "*")).each { |path|
-          manifest << path.gsub(/^public/, '')
+          manifest << path.gsub(/^public/, '')  unless File.directory?(path)
         }
         File.open(system_path(@id, "ochook.manifest"), 'w') { |f|
           f.write(manifest.join("\n"))
