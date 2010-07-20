@@ -16,9 +16,8 @@ post '/publish' do
     params[:secure] ? 24 : 4
   )
   if @ook.valid?
-    redirect(@ook.public_path)
+    redirect("/read/#{@ook.id}")
   else
-    puts(@ook.instance_variable_get(:@invalid).inspect)
     @ook.destroy
     erb(:publish)
   end

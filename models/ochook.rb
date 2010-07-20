@@ -5,9 +5,12 @@ module Chook
 
   class Ochook
 
+    attr_accessor :id
+    attr_reader :invalidity
+
     def self.from_zhook(path, id_length)
       ook = new
-      ook.find_unique_id(id_length)
+      ook.id = ook.find_unique_id(id_length)
       ook.from_zhook(path)
       ook
     end
@@ -15,7 +18,7 @@ module Chook
 
     def self.from_id(id)
       ook = new
-      ook.instance_variable_set(:@id, id)
+      ook.id = id
       ook
     end
 
@@ -27,7 +30,7 @@ module Chook
       }
       raise "Cannot find a unique path"
     rescue => e
-      set_invalid(e)
+      self.invalidity = e
     end
 
 
@@ -35,7 +38,7 @@ module Chook
       FileUtils.mkdir_p(system_path)
 
        `unzip #{path} -d #{system_path}`
-      raise "Not a zip file"  unless $?.exited?
+      raise "Not a zip file"  unless $?.success?
 
       # Validate it.
       unless File.exists?(system_path(@id, "index.html"))
@@ -52,7 +55,7 @@ module Chook
       # Update the Index file to reference the manifest
       insert_manifest_attribute
     rescue => e
-      set_invalid(e)
+      self.invalidity = e
     end
 
 
@@ -65,16 +68,22 @@ module Chook
     end
 
 
-    def public_path(id = @id, contd = [])
-      contd = contd.flatten.compact
-      contd.unshift(id)
-      contd.unshift("books")
-      "/#{File.join(*contd)}/"
+    # def public_path(id = @id, contd = [])
+    #   contd = contd.flatten.compact
+    #   contd.unshift(id)
+    #   contd.unshift("books")
+    #   "/#{File.join(*contd)}/"
+    # end
+
+
+    def metadata(name)
+      doc = parse_document
+      doc.at_css("meta[name=#{name}]")['content']
     end
 
 
     def valid?
-      @invalid ? false : true
+      @invalidity ? false : true
     end
 
 
@@ -83,20 +92,15 @@ module Chook
     end
 
 
-    def set_invalid(exception)
-      @invalid = exception
+    def invalidity=(exception)
+      #raise exception
+      @invalidity = exception
       puts "Ochook invalid: #{@invalid.inspect}"
     end
 
 
     def destroy
       FileUtils.rm_rf(system_path)  if @id
-    end
-
-
-    def metadata(name)
-      doc = parse_document
-      doc.at_css("meta[name=#{name}]")['content']
     end
 
 
