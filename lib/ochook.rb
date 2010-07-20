@@ -8,6 +8,7 @@ module Chook
     attr_accessor :id
     attr_reader :invalidity
 
+
     def self.from_zhook(path, id_length)
       ook = new
       ook.id = ook.find_unique_id(id_length)
@@ -28,7 +29,7 @@ module Chook
         id = generate_id(id_length)
         return id  unless File.directory?(system_path(id))
       }
-      raise "Cannot find a unique path"
+      raise "Cannot find a unique id"
     rescue => e
       self.invalidity = e
     end
@@ -68,14 +69,6 @@ module Chook
     end
 
 
-    # def public_path(id = @id, contd = [])
-    #   contd = contd.flatten.compact
-    #   contd.unshift(id)
-    #   contd.unshift("books")
-    #   "/#{File.join(*contd)}/"
-    # end
-
-
     def metadata(name)
       doc = parse_document
       doc.at_css("meta[name=#{name}]")['content']
@@ -93,9 +86,12 @@ module Chook
 
 
     def invalidity=(exception)
-      #raise exception
-      @invalidity = exception
-      puts "Ochook invalid: #{@invalid.inspect}"
+      if Sinatra::Application.environment == :development
+        raise exception
+      else
+        @invalidity = exception
+        puts "Ochook invalid: #{@invalid.inspect}"
+      end
     end
 
 
