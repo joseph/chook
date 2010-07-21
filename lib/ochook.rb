@@ -37,8 +37,7 @@ module Chook
 
     def from_zhook(path)
       FileUtils.mkdir_p(system_path)
-
-       `unzip #{path} -d #{system_path}`
+      `unzip #{path} -d #{system_path}`
       raise "Not a zip file"  unless $?.success?
 
       unless File.exists?(system_path(@id, "index.html"))
@@ -92,7 +91,7 @@ module Chook
         raise exception
       else
         @invalidity = exception
-        puts "Ochook invalid: #{@invalid.inspect}"
+        #puts "Ochook invalid: #{@invalidity.inspect}"
       end
     end
 
@@ -117,7 +116,13 @@ module Chook
 
 
       def generate_manifest
-        manifest = ["CACHE MANIFEST", "NETWORK:", "*", "CACHE:", "/read/#{@id}/"]
+        manifest = [
+          "CACHE MANIFEST",
+          "NETWORK:",
+          "*",
+          "CACHE:",
+          "/read/#{@id}/"
+        ]
         Dir.glob(File.join(system_path, "**", "*")).each { |path|
           manifest << path.gsub(/^public/, '')  unless File.directory?(path)
         }
