@@ -64,18 +64,15 @@ module Chook
       end
 
 
-      def subsections_html
+      def subsections_html(options = {})
         out = sections.collect { |s|
-          o = s.to_html.strip
+          o = s.to_html(options).strip
           (o.nil? || o.empty?) ? "" : "<li>#{o}</li>"
         }.join.strip
         (out.nil? || out.empty?) ? '' : "<ol>#{out}</ol>\n"
       end
 
-
-      def to_html
-        subsections_html
-      end
+      alias :to_html :subsections_html
 
     end
 
@@ -83,10 +80,11 @@ module Chook
 
     class Section < Outline
 
-      attr_accessor :sections, :heading, :container
+      attr_accessor :sections, :heading, :container, :node
 
 
-      def initialize
+      def initialize(node = nil)
+        self.node = node
         self.sections = []
       end
 
@@ -97,25 +95,25 @@ module Chook
       end
 
 
-      def to_html
-        s = subsections_html
-        h = heading_html
-        h ||= '<br class="anonHeading" />'  if s.empty?
+      def to_html(options = {})
+        s = subsections_html(options)
+        h = heading_html(options)
+        h ||= '<br class="anonHeading" />'  unless s.empty?
         "#{h}#{s}"
       end
 
 
-      def heading_html
-        return nil  unless Utils.heading?(heading)
+      def heading_html(options = {})
+        anon = options[:title_empty_sections] ?
+          "<i>Untitled#{node ? " #{node.name.upcase}" : nil}</i>" :
+          nil
+        return anon  unless Utils.heading?(heading)
         h = heading
         h = h.at_css("h#{Utils.heading_rank(h)}")  if Utils.named?(h, 'HGROUP')
         if h
           t = h.inner_text.strip
-          if t.nil? || t.empty?
-            nil
-          else
-            "<div>#{t}</div>"
-          end
+          t = anon  if t.nil? || t.empty?
+          options[:heading_wrapper] == false ? t : "<div>#{t}</div>"
         end
       end
 
@@ -153,7 +151,7 @@ module Chook
       if Utils.section_content?(node) || Utils.section_root?(node)
         @stack.push(@outlinee)  unless @outlinee.nil?
         @outlinee = node
-        @section = Section.new
+        @section = Section.new(node)
         @outlines[@outlinee] = Outline.new(@section)
         return
       end
@@ -216,8 +214,8 @@ module Chook
     end
 
 
-    def to_html
-      @outlines[@outlinee].to_html
+    def to_html(options = {})
+      @outlines[@outlinee].to_html(options)
     end
 
   end
