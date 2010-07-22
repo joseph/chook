@@ -4,11 +4,6 @@ module Chook
 
   class Componentizer
 
-    HTML5_TAGNAMES = %w[section nav article aside hgroup header footer]
-    COMPONENT_TAGNAMES = %w[body article]
-    XHTML_DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"'+"\n"+
-      '  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
-
     attr_reader :components
 
     def initialize(root)
@@ -28,10 +23,12 @@ module Chook
 
 
     def component?(node)
-      return false  unless COMPONENT_TAGNAMES.include?(node.name.downcase)
-      siblings = node.parent.children
-      siblings = siblings.slice(siblings.index(node) + 1, siblings.size)
-      return false  unless siblings.all? { |sib| component?(sib) }
+      begin
+        return false  unless (
+          %w[body article].include?(node.name.downcase) ||
+          (node.name.downcase == "div" && node['class'].match(/\barticle\b/))
+        )
+      end while node = node.next
       true
     end
 
@@ -45,36 +42,36 @@ module Chook
     end
 
 
-    def write_components(dir)
-      require 'fileutils'
-      FileUtils.mkdir_p(dir)
-
-      @components.each_with_index { |cmpt, i|
-        write_component(cmpt, File.join(dir, "part#{i+1}.xhtml"))
-      }
+    def generate_component(nodes)
+      shell = @root.clone
+      body = shell.at_css('body')
+      body.children.remove
+      [nodes].flatten.compact.each { |ch| body.add_child(ch) }
+      shell
     end
 
 
-    protected
-
-      def write_component(cmpt, path)
-        shell = @root.clone
-        body = shell.at_css('body')
-        body.children.remove
-        [cmpt.name.upcase == "BODY" ? cmpt.children : cmpt].flatten.each { |ch|
-          body.add_child(ch)
-        }
-        out = doc_to_xhtml(shell)
-        File.open(path, 'w') { |f| f.write(out) }
-        #puts "\n======\n#{out}\n"
-        out
-      end
+    def write_components(dir, &blk)
+      require 'fileutils'
+      FileUtils.mkdir_p(dir)
+      paths = []
+      @components.each_with_index { |cmpt, i|
+        paths << File.join(dir, "part#{i+1}.html")
+        write_component(cmpt, paths.last, &blk)
+      }
+      paths
+    end
 
 
-      def doc_to_xhtml(root)
-        root.css(HTML5_TAGNAMES.join(', ')).each { |elem| elem.name = "div" }
-        XHTML_DOCTYPE + "\n" + root.to_xhtml
-      end
+    def write_component(node, path, &blk)
+      shell = generate_component(
+        (node && node.name.upcase == "BODY") ? node.children : node
+      )
+      out = block_given? ? blk.call(shell) : shell.to_html
+      File.open(path, 'w') { |f| f.write(out) }
+      #puts "\n======\n#{out}\n"
+      out
+    end
 
   end
 

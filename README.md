@@ -61,8 +61,22 @@ should be documented. This is that documentation.
 
 ### Recognised metadata names
 
-* title
+Pretty much the Dublin Core set:
 
+* title
+* identifier
+* isbn
+* language
+* creator
+* subject
+* description
+* publisher
+* contributor
+* date
+* source
+* relation
+* coverage
+* rights
 
 ### CSS supported
 

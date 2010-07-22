@@ -23,12 +23,12 @@ class Chook::ComponentizerTest < Test::Unit::TestCase
     cz.write_components(File.join("test", "tmp"))
     assert_equal(
       [
-        "test/tmp/part1.xhtml",
-        "test/tmp/part2.xhtml",
-        "test/tmp/part3.xhtml",
-        "test/tmp/part4.xhtml",
-        "test/tmp/part5.xhtml",
-        "test/tmp/part6.xhtml"
+        "test/tmp/part1.html",
+        "test/tmp/part2.html",
+        "test/tmp/part3.html",
+        "test/tmp/part4.html",
+        "test/tmp/part5.html",
+        "test/tmp/part6.html"
       ],
       Dir.glob("test/tmp/*")
     )

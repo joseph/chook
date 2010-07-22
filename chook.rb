@@ -3,6 +3,9 @@ require 'erb'
 require 'sinatra'
 
 require 'lib/ochook'
+require 'lib/componentizer'
+require 'lib/outliner'
+require 'lib/epub'
 
 
 get '/publish' do
@@ -113,7 +116,7 @@ __END__
       }
       iframe {
         position: absolute;
-        display: none;
+        visibility: hidden;
         border: none;
         background: white;
       }
@@ -133,7 +136,7 @@ __END__
         frame.style.width = cover.offsetWidth+"px";
         frame.style.height = cover.offsetHeight+"px";
         cover.style.display = "none";
-        frame.style.display = "block";
+        frame.style.visibility = "visible";
       }
     </script>
   </head>

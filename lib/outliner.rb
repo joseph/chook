@@ -218,6 +218,15 @@ module Chook
       @outlines[@outlinee].to_html(options)
     end
 
+
+    def recurse_through_sections(&blk)
+      recursion = lambda { |section|
+        blk.call(section)
+        section.sections.each { |sub| recursion.call(sub) }
+      }
+      recursion.call(@outlines[@outlinee])
+    end
+
   end
 
 end

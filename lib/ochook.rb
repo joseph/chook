@@ -19,7 +19,7 @@ module Chook
 
     def self.from_id(id)
       ook = new
-      ook.id = id
+      ook.id = id.to_s
       ook
     end
 
