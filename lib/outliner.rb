@@ -35,10 +35,10 @@ module Chook
       def self.heading_rank(el)
         raise "Not a heading: #{el.inspect}"  unless heading?(el)
         if named?(el, 'HGROUP')
-          1.upto(6) { |n| return (0 - n)  if el.at_css("h#{n}") }
+          1.upto(6) { |n| return n  if el.at_css("h#{n}") }
           raise "Heading not found in HGROUP: #{el.inspect}" # FIXME: how to handle?
         else
-          0 - el.name.reverse.to_i
+          el.name.reverse.to_i
         end
       end
 
@@ -68,8 +68,8 @@ module Chook
         out = sections.collect { |s|
           o = s.to_html.strip
           (o.nil? || o.empty?) ? "" : "<li>#{o}</li>"
-        }.join("\n").strip
-        (out.nil? || out.empty?) ? '' : "<ol>#{out}</ol>"
+        }.join.strip
+        (out.nil? || out.empty?) ? '' : "<ol>#{out}</ol>\n"
       end
 
 
@@ -98,7 +98,10 @@ module Chook
 
 
       def to_html
-        "#{heading_html}\n#{subsections_html}"
+        s = subsections_html
+        h = heading_html
+        h ||= '<br class="anonHeading" />'  if s.empty?
+        "#{h}#{s}"
       end
 
 
@@ -161,14 +164,14 @@ module Chook
         node_rank = Utils.heading_rank(node)
         if !@section.heading
           @section.heading = node
-        elsif node_rank >= @outlines[@outlinee].sections.last.heading_rank
+        elsif node_rank <= @outlines[@outlinee].sections.last.heading_rank
           @section = Section.new
           @section.heading = node
           @outlines[@outlinee].sections.push(@section)
         else
           candidate = @section
           while true
-            if node_rank < candidate.heading_rank
+            if node_rank > candidate.heading_rank
               @section = Section.new
               candidate.append(@section)
               @section.heading = node
