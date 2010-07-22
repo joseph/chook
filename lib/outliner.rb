@@ -127,13 +127,13 @@ module Chook
 
 
 
-    def initialize(start)
+    def initialize(root)
       @outlinee = nil
       @outlines = {}
       @section = Section.new
       @stack = []
 
-      walk(start)
+      walk(root)
     end
 
 
