@@ -49,9 +49,7 @@ module Chook
       # Run the Outliner
       outliner
       # Run the Componentizer
-      componentizer.components.each_with_index { |cmpt, i|
-        cmpt.set_attribute("#{@id}_cmpt_path", "part#{i+1}.html")
-      }
+      componentizer
     end
 
 
@@ -94,15 +92,9 @@ module Chook
               next  if section.heading_html.nil?
               next  if section.heading_html.empty?
 
-              node = (section.node || section.heading)
-              while node && node.respond_to?(:parent)
-                if cmpt = node["#{@id}_cmpt_path"]
-                  node.remove_attribute("#{@id}_cmpt_path')")
-                  break
-                end
-                node = node.parent
-              end
-              next  unless cmpt
+              next  unless cmpt = url_for_component_child(
+                section.node || section.heading
+              )
               xml.navPoint(:id => "navPoint#{x+=1}", :playOrder => x) {
                 xml.navLabel {
                   xml.text_(section.heading_html(:heading_wrapper => false))
@@ -300,6 +292,17 @@ module Chook
 
       def componentizer
         @componentizer ||= Chook::Componentizer.new(@src_doc.root)
+      end
+
+
+      def url_for_component_child(node)
+        while node && node.respond_to?(:parent)
+          if c = componentizer.components.index(node)
+            return "part#{c}.html"
+          end
+          node = node.parent
+        end
+        nil
       end
 
   end
