@@ -30,6 +30,7 @@ module Chook
       epub.id = ochook.id
       epub.src_doc = ochook.send(:parse_document) # FIXME
 
+      epub.analyze
       epub.build_oebps_container
       epub.build_ncx
       epub.write_components
@@ -40,6 +41,17 @@ module Chook
 
     def initialize
       @component_paths = {}
+      @spine_paths = []
+    end
+
+
+    def analyze
+      # Run the Outliner
+      outliner
+      # Run the Componentizer
+      componentizer.components.each_with_index { |cmpt, i|
+        cmpt.set_attribute("#{@id}_cmpt_path", "part#{i+1}.html")
+      }
     end
 
 
@@ -79,11 +91,23 @@ module Chook
             x = 0
             outliner.recurse_through_sections { |section|
               next  unless section.respond_to?(:heading_html) # FIXME
-              xml.navPoint(:id => "navPoint#{x+=1}", :playOrder => 1) { # FIXME
+              next  if section.heading_html.nil?
+              next  if section.heading_html.empty?
+
+              node = (section.node || section.heading)
+              while node && node.respond_to?(:parent)
+                if cmpt = node["#{@id}_cmpt_path"]
+                  node.remove_attribute("#{@id}_cmpt_path')")
+                  break
+                end
+                node = node.parent
+              end
+              next  unless cmpt
+              xml.navPoint(:id => "navPoint#{x+=1}", :playOrder => x) {
                 xml.navLabel {
                   xml.text_(section.heading_html(:heading_wrapper => false))
                 }
-                xml.content(:src => 'part1.html') # FIXME: uh...
+                xml.content(:src => cmpt)
               }
             }
           }
@@ -115,15 +139,18 @@ module Chook
       }
 
       # main content components
-      cz = Chook::Componentizer.new(@src_doc.clone.root)
-      @content_paths = cz.write_components(working_path(OEBPS), &xhtmlize)
-      @content_paths.each { |path|
+      dir = working_path(OEBPS)
+      componentizer.components.each_with_index { |cmpt, i|
+        @spine_paths << File.join(dir, "part#{i+1}.html")
+        componentizer.write_component(cmpt, @spine_paths.last, &xhtmlize)
+      }
+      @spine_paths.each { |path|
         @component_paths[File.basename(path, File.extname(path))] = path
       }
 
       # toc.html
       @component_paths['toc'] = working_path(OEBPS, "toc.html")
-      cz.write_component(
+      componentizer.write_component(
         Nokogiri::XML::Document.parse(outliner.to_html).root,
         @component_paths['toc'],
         &xhtmlize
@@ -132,7 +159,7 @@ module Chook
       # cover.html
       @component_paths['cover-image'] = @component_paths['cover']
       @component_paths['cover'] = working_path(OEBPS, "cover.html")
-      cz.write_component(
+      componentizer.write_component(
         Nokogiri::HTML::Builder.new { |html|
           html.div(:id => "cover") {
             html.img(:src => "cover.png", :alt => metadata(:title))
@@ -187,7 +214,7 @@ module Chook
           xml.spine(:toc => NCX) {
             xml.itemref(:idref => 'cover', :linear => 'no')
             xml.itemref(:idref => 'toc', :linear => 'no')
-            @content_paths.each { |path|
+            @spine_paths.each { |path|
               xml.itemref(:idref => File.basename(path, File.extname(path)))
             }
           }
@@ -268,6 +295,11 @@ module Chook
 
       def outliner
         @outliner ||= Chook::Outliner.new(@src_doc.root)
+      end
+
+
+      def componentizer
+        @componentizer ||= Chook::Componentizer.new(@src_doc.root)
       end
 
   end

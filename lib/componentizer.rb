@@ -8,9 +8,10 @@ module Chook
 
     def initialize(root)
       @root = root
+      @shell = @root.dup
       @components = []
 
-      walk(@root.clone.at_css('body'))
+      walk(@root.at_css('body'))
       @components.reject! { |cmpt| empty_component?(cmpt) }
     end
 
@@ -42,36 +43,23 @@ module Chook
     end
 
 
-    def generate_component(nodes)
-      shell = @root.clone
-      body = shell.at_css('body')
-      body.children.remove
-      [nodes].flatten.compact.each { |ch| body.add_child(ch) }
-      shell
-    end
-
-
-    def write_components(dir, &blk)
-      require 'fileutils'
-      FileUtils.mkdir_p(dir)
-      paths = []
-      @components.each_with_index { |cmpt, i|
-        paths << File.join(dir, "part#{i+1}.html")
-        write_component(cmpt, paths.last, &blk)
-      }
-      paths
-    end
-
-
-    def write_component(node, path, &blk)
-      shell = generate_component(
-        (node && node.name.upcase == "BODY") ? node.children : node
-      )
+    def write_component(cmpt, path, &blk)
+      nodes = (cmpt && cmpt.name.downcase == "body") ? cmpt.children : cmpt
+      shell = generate_component(nodes)
       out = block_given? ? blk.call(shell) : shell.to_html
       File.open(path, 'w') { |f| f.write(out) }
-      #puts "\n======\n#{out}\n"
       out
     end
+
+
+    protected
+
+      def generate_component(nodes)
+        bdy = @shell.at_css('body')
+        bdy.children.remove
+        [nodes].flatten.compact.each { |ch| bdy.add_child(ch) }
+        @shell
+      end
 
   end
 
