@@ -66,8 +66,16 @@ module Chook
     end
 
 
+    def index_document
+      return @doc  if @doc
+      File.open(system_path(@id, "index.html"), 'r') { |f|
+        return @doc = Nokogiri::HTML::Document.parse(f)
+      }
+    end
+
+
     def metadata(name)
-      doc = parse_document
+      doc = index_document
       if node = doc.at_css("meta[name=#{name}]")
         node['content']
       else
@@ -133,18 +141,10 @@ module Chook
 
 
       def insert_manifest_attribute
-        doc = parse_document
+        doc = index_document
         doc.at_css('html').set_attribute('manifest', 'ochook.manifest')
         File.open(system_path(@id, "index.html"), "w") { |f|
           f.write(doc.to_html)
-        }
-      end
-
-
-      def parse_document
-        return @doc  if @doc
-        File.open(system_path(@id, "index.html"), 'r') { |f|
-          return @doc = Nokogiri::HTML::Document.parse(f)
         }
       end
 

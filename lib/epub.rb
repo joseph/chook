@@ -25,12 +25,16 @@ module Chook
     attr_accessor :ochook, :src_doc, :id
 
     def self.from_ochook(ochook)
+      # Initialize the EPUB object.
       epub = new
       epub.ochook = ochook
       epub.id = ochook.id
-      epub.src_doc = ochook.send(:parse_document) # FIXME
+      epub.src_doc = ochook.index_document
 
-      epub.analyze
+
+      epub.find_chapters_and_components_in_index_document
+
+      # Assemble all the EPUB guff.
       epub.build_oebps_container
       epub.build_ncx
       epub.write_components
@@ -45,11 +49,10 @@ module Chook
     end
 
 
-    def analyze
-      # Run the Outliner
-      outliner
-      # Run the Componentizer
-      componentizer
+    def find_chapters_and_components_in_index_document
+      # Process the Zhook index file into chapters and components.
+      outliner.process(@src_doc.root)
+      componentizer.process(@src_doc.root.at_css('body'))
     end
 
 
@@ -293,12 +296,12 @@ module Chook
 
 
       def outliner
-        @outliner ||= Chook::Outliner.new(@src_doc.root)
+        @outliner ||= Chook::Outliner.new(@src_doc)
       end
 
 
       def componentizer
-        @componentizer ||= Chook::Componentizer.new(@src_doc.root)
+        @componentizer ||= Chook::Componentizer.new(@src_doc)
       end
 
 

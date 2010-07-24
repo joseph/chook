@@ -6,12 +6,16 @@ module Chook
 
     attr_reader :components
 
-    def initialize(root)
-      @root = root
-      @shell = @root.dup
+    def initialize(doc)
+      @document = doc
+      @shell = @document.root.dup
       @components = []
+    end
 
-      walk(@root.at_css('body'))
+
+    def process(from)
+      @components = []
+      walk(from)
       @components.reject! { |cmpt| empty_component?(cmpt) }
     end
 
@@ -57,7 +61,7 @@ module Chook
       def generate_component(nodes)
         bdy = @shell.at_css('body')
         bdy.children.remove
-        [nodes].flatten.compact.each { |ch| bdy.add_child(ch) }
+        [nodes].flatten.compact.each { |node| bdy.add_child(node.dup) }
         @shell
       end
 

@@ -106,13 +106,17 @@ module Chook
 
 
 
-    def initialize(root)
+    def initialize(doc)
+      @document = doc
+    end
+
+
+    def process(from)
       @outlinee = nil
       @outlines = {}
       @section = Section.new
       @stack = []
-
-      walk(root)
+      walk(from)
     end
 
 
