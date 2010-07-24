@@ -64,15 +64,9 @@ module Chook
       end
 
 
-      def subsections_html(options = {})
-        out = sections.collect { |s|
-          o = s.to_html(options).strip
-          (o.nil? || o.empty?) ? "" : "<li>#{o}</li>"
-        }.join.strip
-        (out.nil? || out.empty?) ? '' : "<ol>#{out}</ol>\n"
+      def heading_text
+        nil
       end
-
-      alias :to_html :subsections_html
 
     end
 
@@ -95,26 +89,11 @@ module Chook
       end
 
 
-      def to_html(options = {})
-        s = subsections_html(options)
-        h = heading_html(options)
-        h ||= '<br class="anonHeading" />'  unless s.empty?
-        "#{h}#{s}"
-      end
-
-
-      def heading_html(options = {})
-        anon = options[:title_empty_sections] ?
-          "<i>Untitled#{node ? " #{node.name.upcase}" : nil}</i>" :
-          nil
-        return anon  unless Utils.heading?(heading)
+      def heading_text
+        return nil  unless Utils.heading?(heading)
         h = heading
         h = h.at_css("h#{Utils.heading_rank(h)}")  if Utils.named?(h, 'HGROUP')
-        if h
-          t = h.inner_text.strip
-          t = anon  if t.nil? || t.empty?
-          options[:heading_wrapper] == false ? t : "<div>#{t}</div>"
-        end
+        h && !h.inner_text.strip.empty? ? h.inner_text.strip : nil
       end
 
 
@@ -189,8 +168,6 @@ module Chook
         return
       end
 
-      # H5O's modification would go here...
-
       if Utils.section_content?(node) && !@stack.empty?
         @outlinee = @stack.pop
         @section = @outlines[@outlinee].sections.last
@@ -214,17 +191,22 @@ module Chook
     end
 
 
-    def to_html(options = {})
-      @outlines[@outlinee].to_html(options)
+    def to_html
+      curse = lambda { |section|
+        below = section.sections.collect { |ch|
+          ch_out = curse.call(ch).strip
+          (ch_out.nil? || ch_out.empty?) ? "" : "<li>#{ch_out}</li>"
+        }.join.strip
+        below = (below.nil? || below.empty?) ? "" : "<ol>#{below}</ol>\n"
+        heading = block_given? ? yield(section, below) : section.heading_text
+        "#{heading}#{below}"
+      }
+      curse.call(result_root)
     end
 
 
-    def recurse_through_sections(&blk)
-      recursion = lambda { |section|
-        blk.call(section)
-        section.sections.each { |sub| recursion.call(sub) }
-      }
-      recursion.call(@outlines[@outlinee])
+    def result_root
+      @outlines[@outlinee]
     end
 
   end

@@ -71,6 +71,19 @@ module Chook
 
 
     def build_ncx
+      x = 0
+      curse = lambda { |xml, section|
+        if cmpt = url_for_component_child(section.node || section.heading)
+          xml.navPoint(:id => "navPoint#{x+=1}", :playOrder => x) {
+            xml.navLabel { xml.text_(section.heading_text) }
+            xml.content(:src => cmpt)
+            section.sections.collect { |ch|
+              curse.call(xml, ch)  unless ch.heading_text.nil?
+            }
+          }
+        end
+      }
+
       p = build_xml_file(working_path(OEBPS, "#{NCX}.ncx")) { |xml|
         xml.ncx(
           'xmlns' => "http://www.daisy.org/z3986/2005/ncx/",
@@ -86,22 +99,7 @@ module Chook
             xml.text_(metadata(:title))
           }
           xml.navMap {
-            x = 0
-            outliner.recurse_through_sections { |section|
-              next  unless section.respond_to?(:heading_html) # FIXME
-              next  if section.heading_html.nil?
-              next  if section.heading_html.empty?
-
-              next  unless cmpt = url_for_component_child(
-                section.node || section.heading
-              )
-              xml.navPoint(:id => "navPoint#{x+=1}", :playOrder => x) {
-                xml.navLabel {
-                  xml.text_(section.heading_html(:heading_wrapper => false))
-                }
-                xml.content(:src => cmpt)
-              }
-            }
+            outliner.result_root.sections.each { |ch| curse.call(xml, ch) }
           }
         }
       }
@@ -142,8 +140,12 @@ module Chook
 
       # toc.html
       @component_paths['toc'] = working_path(OEBPS, "toc.html")
+      outline_html = outliner.to_html { |section, below|
+        heading = section.heading_text
+        heading ||= '<br class="anon" />'  unless below.empty?
+      }
       componentizer.write_component(
-        Nokogiri::XML::Document.parse(outliner.to_html).root,
+        Nokogiri::HTML::Document.parse(outliner.to_html).root,
         @component_paths['toc'],
         &xhtmlize
       )
@@ -298,7 +300,7 @@ module Chook
       def url_for_component_child(node)
         while node && node.respond_to?(:parent)
           if c = componentizer.components.index(node)
-            return "part#{c}.html"
+            return "part#{c+1}.html"
           end
           node = node.parent
         end
