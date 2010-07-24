@@ -73,7 +73,7 @@ module Chook
     def build_ncx
       x = 0
       curse = lambda { |xml, section|
-        if cmpt = url_for_component_child(section.node || section.heading)
+        if cmpt = url_for_section(section)
           xml.navPoint(:id => "navPoint#{x+=1}", :playOrder => x) {
             xml.navLabel { xml.text_(section.heading_text) }
             xml.content(:src => cmpt)
@@ -142,10 +142,15 @@ module Chook
       @component_paths['toc'] = working_path(OEBPS, "toc.html")
       outline_html = outliner.to_html { |section, below|
         heading = section.heading_text
-        heading ||= '<br class="anon" />'  unless below.empty?
+        if heading
+          heading = '<a href="'+url_for_section(section)+'">'+heading+'</a>'
+        elsif !below.empty?
+          heading = '<br class="anon" />'
+        end
+        heading
       }
       componentizer.write_component(
-        Nokogiri::HTML::Document.parse(outliner.to_html).root,
+        Nokogiri::HTML::Document.parse(outline_html).root,
         @component_paths['toc'],
         &xhtmlize
       )
@@ -297,12 +302,15 @@ module Chook
       end
 
 
-      def url_for_component_child(node)
-        while node && node.respond_to?(:parent)
-          if c = componentizer.components.index(node)
-            return "part#{c+1}.html"
+      def url_for_section(section)
+        sid = section.heading['id'] || section.node['id']
+        sid = "#"+sid  if sid && !sid.empty?
+        n = section.node || section.heading
+        while n && n.respond_to?(:parent)
+          if cmptIndex = componentizer.components.index(n)
+            return "part#{cmptIndex+1}.html#{sid}"
           end
-          node = node.parent
+          n = n.parent
         end
         nil
       end
