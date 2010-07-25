@@ -109,6 +109,80 @@ module Chook
     end
 
 
+    # Turns an ochook into a Monocle-style raw book object. Options:
+    #
+    # * :componentize - true/false. Splits Index file into components.
+    #     Defaults to false.
+    #
+    def to_book(options = {})
+      bk = Chook::Book.new
+
+      # Components
+      cmpt_lookup = {}
+      if options[:componentize]
+        componentizer = Chook::Componentizer.new(index_document)
+        componentizer.process(index_document.root.at_css('body'))
+        componentizer.components.each_with_index { |cmpt, i|
+          uri = i == 0 ? "index.html" : "part#{"%03d" % i}.html"
+          cmpt_lookup.update(cmpt => uri)
+          doc = componentizer.generate_component(cmpt)
+          bk.components.push(uri => doc.to_html)
+        }
+      else
+        bk.components.push(index_document.to_html, "index.html")
+        cmpt_lookup.update(index_document.at_css('body') => "index.html")
+      end
+
+      # Contents
+      outliner = Chook::Outliner.new(index_document)
+      outliner.process(index_document.root)
+      curse = lambda { |sxn|
+        # Find the component parent
+        n = sxn.node || sxn.heading
+        while n && n.respond_to?(:parent)
+          break if cmptURI = cmpt_lookup[n]
+          n = n.parent
+        end
+
+        if cmptURI
+          # get URI for section
+          sid = sxn.heading['id']  if sxn.heading
+          sid ||= sxn.node['id']  if sxn.node
+          cmptURI += "#"+sid  if sid && !sid.empty?
+
+          chapter = {
+            :title => sxn.heading_text,
+            :src => cmptURI
+          }
+
+          # identify any relevant child sections
+          children = sxn.sections.collect { |ch|
+            curse.call(ch)  unless ch.empty?
+          }.compact
+
+          chapter[:children] = children  if children.any?
+
+          chapter
+        else
+          nil
+        end
+      }
+      bk.contents = curse.call(outliner.result_root)[:children]
+
+      # Strip blank roots from contents
+      while bk.contents.length == 1 && bk.contents.first[:title].nil?
+        bk.contents = bk.contents.first[:children]
+      end
+
+      # Metadata
+      index_document.css('head meta[name]').each { |meta|
+        bk.metadata.update(meta['name'] => meta['content'])
+      }
+
+      bk
+    end
+
+
     protected
 
       def generate_id(len = 4)

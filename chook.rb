@@ -2,6 +2,7 @@ require 'rubygems'
 require 'erb'
 require 'sinatra'
 
+require 'lib/book'
 require 'lib/ochook'
 require 'lib/componentizer'
 require 'lib/outliner'

@@ -80,7 +80,7 @@ module Chook
           xml.navPoint(:id => "navPoint#{x+=1}", :playOrder => x) {
             xml.navLabel { xml.text_(section.heading_text) }
             xml.content(:src => cmpt)
-            section.sections.collect { |ch|
+            section.sections.each { |ch|
               curse.call(xml, ch)  unless ch.heading_text.nil?
             }
           }
@@ -147,13 +147,13 @@ module Chook
         heading = section.heading_text
         if heading
           heading = '<a href="'+url_for_section(section)+'">'+heading+'</a>'
-        elsif !below.empty?
+        elsif section.respond_to?(:container) && section.container && !below.empty?
           heading = '<br class="anon" />'
         end
         heading
       }
       componentizer.write_component(
-        Nokogiri::HTML::Document.parse(outline_html).root,
+        Nokogiri::HTML::Document.parse(outline_html).at_css('body'),
         @component_paths['toc'],
         &xhtmlize
       )

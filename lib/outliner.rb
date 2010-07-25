@@ -53,26 +53,7 @@ module Chook
     end
 
 
-
-    class Outline
-
-      attr_accessor :sections
-
-
-      def initialize(sections)
-        self.sections = [sections].flatten
-      end
-
-
-      def heading_text
-        nil
-      end
-
-    end
-
-
-
-    class Section < Outline
+    class Section
 
       attr_accessor :sections, :heading, :container, :node
 
@@ -86,6 +67,11 @@ module Chook
       def append(subsection)
         subsection.container = self
         sections.push(subsection)
+      end
+
+
+      def empty?
+        heading_text.nil? && sections.all? { |sxn| sxn.empty? }
       end
 
 
@@ -135,7 +121,8 @@ module Chook
         @stack.push(@outlinee)  unless @outlinee.nil?
         @outlinee = node
         @section = Section.new(node)
-        @outlines[@outlinee] = Outline.new(@section)
+        @outlines[@outlinee] = Section.new(node)
+        @outlines[@outlinee].sections = [@section]
         return
       end
 
