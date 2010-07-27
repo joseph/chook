@@ -109,6 +109,27 @@ module Chook
     end
 
 
+    def toc_html
+      url_for_section = lambda { |sxn|
+        sid = sxn.heading['id'] || sxn.node['id']
+        return ''  unless sid && !sid.empty?
+        sid = "#"+sid
+      }
+
+      outliner = Chook::Outliner.new(index_document)
+      outliner.process(index_document.root)
+      outline_html = outliner.to_html { |section, below|
+        heading = section.heading_text
+        if heading
+          heading = '<a href="'+url_for_section.call(section)+'">'+heading+'</a>'
+        elsif section.respond_to?(:container) && section.container && !below.empty?
+          heading = '<br class="anon" />'
+        end
+        heading
+      }
+    end
+
+
     protected
 
       def generate_id(len = 4)
