@@ -119,16 +119,78 @@ __END__
         visibility: hidden;
         border: none;
         background: white;
+        z-index: 0;
       }
-      #hiddenTOC {
+      #nav {
+        position: absolute;
+        top: 0;
+        left: 0;
         display: none;
+        z-index: 1;
+      }
+      #tocCntr {
+        max-height: 50%;
+        overflow: auto;
+        background: #222;
+        display: none;
+        color: #999;
+        font: 9pt Lucide Grande, Tahoma, sans-serif;
+      }
+      #tocCntr ol {
+        padding-left: 1em;
+        counter-reset: item;
+      }
+      #tocCntr ol li {
+        display: block;
+      }
+      #tocCntr ol li:before {
+        content: counters(item, ".") " ";
+        counter-increment: item;
+      }
+      #tocCntr a {
+        color: #EEE;
+        text-decoration: none;
+      }
+      #tocButtons {
+        margin-left: 50%;
+        width: 46%;
+        color: white;
+        text-align: center;
+        cursor: pointer;
+        font: 10pt Lucide Grande, Tahoma, sans-serif;
+      }
+      #tocArrLeft {
+        font-weight: bold;
+        width: 2em;
+        float: left;
+        background: #222;
+        -webkit-border-bottom-left-radius: 6px;
+        -moz-border-radius-bottomleft: 6px;
+        border-bottom-left-radius: 6px;
+        padding: 0 0 0.3em;
+      }
+      #tocArrRight {
+        font-weight: bold;
+        width: 2em;
+        float: right;
+        background: #222;
+        -webkit-border-bottom-right-radius: 6px;
+        -moz-border-radius-bottomright: 6px;
+        border-bottom-right-radius: 6px;
+        padding: 0 0 0.3em;
+      }
+      #tocTab {
+        background: #222;
+        overflow: hidden;
+        padding: 0.5em 0;
       }
     </style>
     <script type="text/javascript">
+      var $ = function (id) { return document.getElementById(id) };
       var ochook = {};
 
       function setup() {
-        var frame = document.getElementById('reader');
+        var frame = $('reader');
         frame.contentDocument.documentElement.setAttribute(
           'id',
           'RS:org.ochook.reader'
@@ -136,57 +198,40 @@ __END__
       }
 
       function read() {
-        var cover = document.getElementById('cover');
-        var frame = document.getElementById('reader');
+        var cover = $('cover');
+        var nav = $('nav');
+        var frame = $('reader');
+        nav.style.width = cover.offsetWidth+"px";
         frame.style.width = cover.offsetWidth+"px";
         frame.style.height = cover.offsetHeight+"px";
         cover.style.display = "none";
+        nav.style.display = "block";
         frame.style.visibility = "visible";
         applyTOC(frame);
       }
 
       function applyTOC(frame) {
         var doc = frame.contentDocument;
-        ochook.ctrl = doc.createElement('div');
-        ochook.ctrl.style.cssText = "position: fixed; top: 0; left: 0; width: 100%;";
-        doc.body.appendChild(ochook.ctrl);
-
-        ochook.tocCntr = doc.createElement('div');
-        ochook.tocCntr.innerHTML = document.getElementById('hiddenTOC').innerHTML;
-        ochook.tocCntr.style.cssText = "max-height: 50%; overflow: auto; background: #CCC; display: none;";
-        ochook.ctrl.appendChild(ochook.tocCntr);
-
-        ochook.tocButtons = doc.createElement('div');
-        ochook.tocButtons.style.cssText = "margin-left: 50%; width: 48%; color: white; text-align: center; cursor: pointer;";
-        ochook.ctrl.appendChild(ochook.tocButtons);
-
-        ochook.tocArrLeft = doc.createElement('div');
-        ochook.tocArrRight = doc.createElement('div');
-        ochook.tocArrLeft.innerHTML = "&larr;";
-        ochook.tocArrRight.innerHTML = "&rarr;";
-        ochook.tocArrLeft.style.cssText = "width: 2em; background: #900; float: left;";
-        ochook.tocArrRight.style.cssText = "width: 2em; background: #009; float: right;";
-        ochook.tocArrLeft.onclick = function () {
+        $('tocArrLeft').onclick = function () {
           if (!ochook.prevChapter) { return; }
           ochook.prevChapter.anchor.scrollIntoView();
         }
-        ochook.tocArrRight.onclick = function () {
+        $('tocArrRight').onclick = function () {
           if (!ochook.nextChapter) { return; }
           ochook.nextChapter.anchor.scrollIntoView();
         }
 
-        ochook.tocButtons.appendChild(ochook.tocArrLeft);
-        ochook.tocButtons.appendChild(ochook.tocArrRight);
-
-        ochook.tocTab = doc.createElement('div');
-        ochook.tocTab.innerHTML = "The title of this chapter";
-        ochook.tocTab.style.cssText = "background: #909; overflow: hidden; text-overflow: ellipsis;"
+        ochook.tocCntr = $('tocCntr');
+        ochook.tocTab = $('tocTab');
         ochook.tocTab.onclick = toggleTOC;
-        ochook.tocButtons.appendChild(ochook.tocTab);
 
         lineariseTOC(frame);
         updateTOCTab(frame);
-        frame.contentWindow.addEventListener("scroll", function () { updateTOCTab(frame); }, true);
+        frame.contentWindow.addEventListener(
+          "scroll",
+          function () { updateTOCTab(frame); },
+          true
+        );
       }
 
 
@@ -204,37 +249,38 @@ __END__
             if (ch.tagName.toLowerCase() == "li") {
               for (var j = 0; j < ch.childNodes.length; ++j) {
                 var lich = ch.childNodes[j];
-                if (lich.tagName.toLowerCase() == "ol") {
+                if (!lich.tagName) {
+                } else if (lich.tagName.toLowerCase() == "ol") {
                   curse(lich);
                 } else if (lich.tagName.toLowerCase() == "a") {
-                  var id = lich.getAttribute("href");
-                  if (id) {
-                    id = id.replace(/^#/, '');
-                    var anchor = frame.contentDocument.getElementById(id);
-                    ochook.linearTOC.push({
-                      id: id,
-                      anchor: anchor,
-                      offset: anchor.offsetTop
-                    });
-                    lich.onclick = function () {
-                      anchor.scrollIntoView();
-                      toggleTOC();
-                      return false;
-                    }
-                  } else {
-                    lich.setAttribute("href", "#");
-                    lich.onclick = function () {
-                      frame.contentWindow.scrollTo(0, 0);
-                      toggleTOC();
-                      return false;
-                    }
-                  }
+                  prepTocItem(lich, frame);
                 }
               }
             }
           }
         }
-        curse(frame.contentDocument.getElementsByTagName('ol')[0]);
+        curse($('tocCntr').getElementsByTagName('ol')[0]);
+      }
+
+
+      function prepTocItem(lich, frame) {
+        var id = lich.getAttribute("href");
+        id = id.replace(/^#/, '');
+        var anchor = frame.contentDocument.getElementById(id);
+        if (anchor) {
+          ochook.linearTOC.push({
+            id: id,
+            anchor: anchor,
+            offset: anchor.offsetTop
+          });
+          lich.onclick = function (l) {
+            anchor.scrollIntoView();
+            toggleTOC();
+            return false;
+          }
+        } else {
+          console.log("ID not found: "+id);
+        }
       }
 
 
@@ -268,8 +314,15 @@ __END__
   </head>
   <body>
     <img id="cover" src="/books/<%= @id %>/cover.png" onclick="read()" />
+    <div id="nav">
+      <div id="tocCntr"><%= @ook.toc_html %></div>
+      <div id="tocButtons">
+        <div id="tocArrLeft">&larr;</div>
+        <div id="tocArrRight">&rarr;</div>
+        <div id="tocTab"></div>
+      </div>
+    </div>
     <iframe id="reader" src="/books/<%= @id %>/index.html" onload="setup()">
     </iframe>
-    <div id="hiddenTOC"><%= @ook.toc_html %></div>
   </body>
 </html>

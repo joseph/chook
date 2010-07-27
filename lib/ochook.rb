@@ -110,19 +110,19 @@ module Chook
 
 
     def toc_html
-      url_for_section = lambda { |sxn|
+      link_to_section = lambda { |sxn, heading|
         sid = sxn.heading['id'] || sxn.node['id']
-        return ''  unless sid && !sid.empty?
-        sid = "#"+sid
+        return heading  unless sid && !sid.empty?
+        '<a href="#'+sid+'">'+heading+'</a>'
       }
 
       outliner = Chook::Outliner.new(index_document)
       outliner.process(index_document.root)
-      outline_html = outliner.to_html { |section, below|
-        heading = section.heading_text
+      outline_html = outliner.to_html { |sxn, below|
+        heading = sxn.heading_text
         if heading
-          heading = '<a href="'+url_for_section.call(section)+'">'+heading+'</a>'
-        elsif section.respond_to?(:container) && section.container && !below.empty?
+          heading = link_to_section.call(sxn, heading)
+        elsif sxn.respond_to?(:container) && sxn.container && !below.empty?
           heading = '<br class="anon" />'
         end
         heading
