@@ -1,4 +1,5 @@
 .screenrc
 Capfile
-/public
+/public/book
+/public/format
 /ext

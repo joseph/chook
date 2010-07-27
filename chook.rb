@@ -88,7 +88,7 @@ end
 #
 get '/:book_id/format/:format' do
   halt(404)  unless %w[epub zhook].include?(params[:format])
-  path = "/formats/#{params[:book_id]}/#{params[:book_id]}.#{params[:format]}"
+  path = "/format/#{params[:book_id]}/#{params[:book_id]}.#{params[:format]}"
   unless File.exists?("public#{path}")
     @id = params[:book_id]
     @ook = Chook::Ochook.from_id(@id)

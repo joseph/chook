@@ -1,0 +1,29 @@
+textarea#code {
+  position: absolute;
+  width: 80%;
+  height: 98%;
+}
+
+
+table.meta {
+  border-collapse: collapse;
+  font: 9pt Lucide Grande, Tahoma, Verdana, sans-serif;
+}
+
+table.meta th, table.meta td {
+  text-align: left;
+  border: 1px solid #EEE;
+  margin: 3px;
+  padding: 3px;
+}
+
+table.meta th.known {
+  color: #390;
+}
+table.meta th.unknown {
+  color: #C60;
+}
+table.meta th.missing {
+  color: #900;
+}
+

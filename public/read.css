@@ -1,0 +1,85 @@
+body {
+  background: black;
+  margin: 0;
+}
+img {
+  position: absolute;
+}
+iframe {
+  position: absolute;
+  visibility: hidden;
+  border: none;
+  background: white;
+  z-index: 0;
+  height: 100%;
+}
+#nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  z-index: 1;
+}
+#tocCntr {
+  max-height: 50%;
+  overflow: auto;
+  background: #222;
+  background: rgba(30,30,30,0.9);
+  display: none;
+  color: #999;
+  font: 9pt Lucide Grande, Tahoma, sans-serif;
+  text-shadow: 1px 1px 0 #000;
+}
+#tocCntr ol {
+  padding-left: 1em;
+  counter-reset: item;
+}
+#tocCntr ol li {
+  display: block;
+}
+#tocCntr ol li:before {
+  content: counters(item, ".") " ";
+  counter-increment: item;
+}
+#tocCntr a {
+  color: #EEE;
+  text-decoration: none;
+}
+#tocButtons {
+  margin-left: 50%;
+  width: 46%;
+  color: #EEE;
+  text-align: center;
+  cursor: pointer;
+  font: 10pt Lucide Grande, Tahoma, sans-serif;
+  text-shadow: 1px 1px 0 #000;
+}
+#tocArrLeft {
+  font-weight: bold;
+  width: 2em;
+  float: left;
+  background: #222;
+  background: rgba(30,30,30,0.9);
+  -webkit-border-bottom-left-radius: 6px;
+  -moz-border-radius-bottomleft: 6px;
+  border-bottom-left-radius: 6px;
+  padding: 0 0 0.3em;
+}
+#tocArrRight {
+  font-weight: bold;
+  width: 2em;
+  float: right;
+  background: #222;
+  background: rgba(30,30,30,0.9);
+  -webkit-border-bottom-right-radius: 6px;
+  -moz-border-radius-bottomright: 6px;
+  border-bottom-right-radius: 6px;
+  padding: 0 0 0.3em;
+}
+#tocTab {
+  background: #222;
+  background: rgba(30,30,30,0.9);
+  overflow: hidden;
+  padding: 0 0 0.3em;
+}
+
