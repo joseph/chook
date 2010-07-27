@@ -1,0 +1,34 @@
+<% known_names = [
+  'title',
+  'identifier',
+  'isbn',
+  'language',
+  'creator',
+  'subject',
+  'description',
+  'publisher',
+  'contributor',
+  'date',
+  'source',
+  'relation',
+  'coverage',
+  'rights'
+] %>
+<% used_names = [] %>
+<table class="meta">
+  <% @ook.index_document.css('head meta[name]').each do |meta| %>
+    <% name = used_names.push(meta['name']).last %>
+    <tr>
+      <th class="<%= known_names.include?(name) ? 'known' : 'unknown' %>">
+        <%= name %>
+      </th>
+      <td><%= meta['content'] %></td>
+    </tr>
+  <% end %>
+  <% (known_names - used_names).each do |name| %>
+    <tr>
+      <th class="missing"><%= name %></th>
+      <td>&#8211;</td>
+    </tr>
+  <% end %>
+</table>

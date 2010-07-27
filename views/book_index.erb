@@ -1,0 +1,19 @@
+<% @page_title = "#{@ook.id}: #{h @ook.metadata('title')}" %>
+
+<div class="zhookReaderLink">
+  <a href="/<%= @ook.id %>/read">View in Zhook Reader</a>
+</div>
+
+<div class="ochookReaderLink">
+  <a href="/book/<%= @ook.id %>/">View as Ochook</a>
+</div>
+
+<div class="epubDownloadLink">
+  <a href="/<%= @ook.id %>/format/epub">Download EPUB</a>
+</div>
+
+<!--
+<div class="zhookDownloadLink">
+  <a href="/<%= @ook.id %>/format/zhook">Download Zhook</a>
+</div>
+-->

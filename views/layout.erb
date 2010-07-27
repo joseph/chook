@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title><%= @page_title %></title>
+    <link rel="stylesheet" type="text/css" href="/book_data.css" />
+  </head>
+  <body>
+
+    <ul>
+      <li><a href="/<%= @ook.id %>"><%= h @ook.metadata('title') %></a></li>
+      <li><a href="/<%= @ook.id %>/contents">Contents</a></li>
+      <li><a href="/<%= @ook.id %>/metadata">Metadata</a></li>
+      <li><a href="/<%= @ook.id %>/html">HTML</a></li>
+    </ul>
+
+    <%= yield %>
+
+  </body>
+</html>
+

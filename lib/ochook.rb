@@ -57,12 +57,12 @@ module Chook
 
 
     def system_path(id = @id, *args)
-      pave('public', 'books', id, args)
+      pave('public', 'book', id, args)
     end
 
 
     def public_path(id = @id, *args)
-      "/#{pave('books', id, args)}"
+      "/#{pave('book', id, args)}"
     end
 
 

@@ -40,6 +40,7 @@ module Chook
       epub.write_components
       epub.build_opf
       epub.zip_it_up
+      epub.cleanup
     end
 
 
@@ -253,13 +254,18 @@ module Chook
     end
 
 
+    def cleanup
+      # TODO: delete the working directory...
+    end
+
+
     def system_path(id = @id, *args)
-      pave('public', 'epubs', id, args)
+      pave('public', 'formats', id, args)
     end
 
 
     def working_path(*args)
-      pave('public', 'epubs', @id, 'raw', args)
+      pave('public', 'formats', @id, 'epub', args)
     end
 
 
@@ -306,8 +312,10 @@ module Chook
 
 
       def url_for_section(section)
-        sid = section.heading['id'] || section.node['id']
+        sid = section.heading['id']  if section.heading
+        sid ||= section.node['id']  if section.node
         sid = "#"+sid  if sid && !sid.empty?
+
         n = section.node || section.heading
         while n && n.respond_to?(:parent)
           if cmptIndex = componentizer.components.index(n)
