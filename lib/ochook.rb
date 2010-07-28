@@ -109,11 +109,11 @@ module Chook
     end
 
 
-    def toc_html
+    def toc_html(path = '')
       link_to_section = lambda { |sxn, heading|
         sid = sxn.heading['id'] || sxn.node['id']
         return heading  unless sid && !sid.empty?
-        '<a href="#'+sid+'">'+heading+'</a>'
+        '<a href="'+path+'#'+sid+'">'+heading+'</a>'
       }
 
       outliner = Chook::Outliner.new(index_document)
@@ -127,6 +127,17 @@ module Chook
         end
         heading
       }
+    end
+
+
+    def tof_html(path = '')
+      out = nil
+      index_document.css('figure[id]').each { |fig|
+        next  unless caption = fig.at_css('figcaption')
+        out ||= "<ol>"
+        out << '<li><a href="'+path+'#'+fig['id']+'">'+caption.content+'</a></li>'
+      }
+      out ? out+"</ol>" : nil
     end
 
 
