@@ -93,7 +93,7 @@ module Chook
         return nil  unless Utils.heading?(heading)
         h = heading
         h = h.at_css("h#{Utils.heading_rank(h)}")  if Utils.named?(h, 'HGROUP')
-        h && !h.inner_text.strip.empty? ? h.inner_text.strip : nil
+        (h && !h.content.strip.empty?) ? h.content.strip : nil
       end
 
 

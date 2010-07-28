@@ -4,12 +4,12 @@ module Chook
 
   class Epub
 
-    HTML5_TAGNAMES = %w[section nav article aside hgroup header footer]
+    HTML5_TAGNAMES = %w[section nav article aside hgroup header footer figure figcaption] # FIXME: Which to divify? Which to leave as-is?
     XHTML_DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"'+"\n"+
       '  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">'
     MIMETYPE_MAP = {
       '.gif' => 'image/gif',
-      '.jpg' => 'image/jpg',
+      '.jpg' => 'image/jpeg',
       '.png' => 'image/png',
       '.svg' => 'image/svg+xml',
       '.html' => 'application/xhtml+xml',
@@ -30,7 +30,6 @@ module Chook
       epub.ochook = ochook
       epub.id = ochook.id
       epub.src_doc = ochook.index_document
-
 
       epub.find_chapters_and_components_in_index_document
 
@@ -119,6 +118,7 @@ module Chook
           elem['class'] = "#{k.nil? || k.empty? ? '' : "#{k} " }#{elem.name}"
           elem.name = "div"
         }
+        root.remove_attribute('xmlns')
         "#{XHTML_DOCTYPE}\n#{root.to_xhtml}"
       }
 
@@ -260,12 +260,12 @@ module Chook
 
 
     def system_path(id = @id, *args)
-      pave('public', 'formats', id, args)
+      pave('public', 'format', id, args)
     end
 
 
     def working_path(*args)
-      pave('public', 'formats', @id, 'epub', args)
+      pave('public', 'format', @id, 'epub', args)
     end
 
 

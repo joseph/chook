@@ -44,7 +44,7 @@ post '/publish' do
     { "public" => 4, "private" => 24 }[params[:security]]
   )
   if @ook.valid?
-    redirect("/fix/#{@ook.id}")
+    redirect("/#{@ook.id}")
   else
     @ook.destroy
     erb(:publish, :layout => false)

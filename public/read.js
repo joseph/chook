@@ -2,13 +2,19 @@ var $ = function (id) { return document.getElementById(id) };
 var ochook = {};
 
 
-function setup() {
+function setup(part) {
+  ochook.inited = (ochook.inited || '') + part;
+  if (ochook.inited == 'a' || ochook.inited == 'b') {
+    return;
+  }
   var frame = $('reader');
   frame.contentDocument.documentElement.setAttribute(
     'id',
     'RS:org.ochook.reader'
   );
-  frame.contentDocument.body.style.wordWrap = "break-word !important";
+  var bdy = frame.contentDocument.body;
+  bdy.style.wordWrap = "break-word";
+  bdy.style.padding = "0 2em";
   var cover = $('cover');
   var nav = $('nav');
   var frame = $('reader');

@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html manifest="<%= @ook.public_path(@ook.id, "ochook.manifest") %>">
   <head>
-    <title><%= h(@ook.metadata('title')) %></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <script type="text/javascript" src="/read.js"></script>
     <link rel="stylesheet" type="text/css" href="/read.css" />
+    <title><%= h(@ook.metadata('title')) %></title>
   </head>
-  <body>
+  <body onload="setup('a')">
     <img id="cover" src="/book/<%= @id %>/cover.png" onclick="read()" />
     <div id="nav">
       <div id="tocCntr"><%= @ook.toc_html %></div>
@@ -17,7 +18,7 @@
         <div id="tocTab"></div>
       </div>
     </div>
-    <iframe id="reader" src="/book/<%= @id %>/index.html" onload="setup()">
+    <iframe id="reader" src="/book/<%= @id %>/index.html" onload="setup('b')">
     </iframe>
   </body>
 </html>
