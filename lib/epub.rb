@@ -76,11 +76,11 @@ module Chook
     def build_ncx
       x = 0
       curse = lambda { |xml, section|
-        if cmpt = url_for_section(section)
+        if cmpt = url_for_node(section.heading || section.node)
           xml.navPoint(:id => "navPoint#{x+=1}", :playOrder => x) {
             xml.navLabel { xml.text_(section.heading_text) }
             xml.content(:src => cmpt)
-            section.sections.collect { |ch|
+            section.sections.each { |ch|
               curse.call(xml, ch)  unless ch.heading_text.nil?
             }
           }
@@ -147,17 +147,28 @@ module Chook
       outline_html = outliner.to_html { |section, below|
         heading = section.heading_text
         if heading
-          heading = '<a href="'+url_for_section(section)+'">'+heading+'</a>'
+          url = url_for_node(section.heading || section.node)
+          heading = '<a href="'+url+'">'+heading+'</a>'
         elsif section.respond_to?(:container) && section.container && !below.empty?
           heading = '<br class="anon" />'
         end
         heading
       }
       componentizer.write_component(
-        Nokogiri::HTML::Document.parse(outline_html).at_css('body'),
+        Nokogiri::HTML.fragment(outline_html),
         @component_paths['toc'],
         &xhtmlize
       )
+
+      # loi.html
+      if loi_html = @ochook.loi_html { |fig| url_for_node(fig) }
+        @component_paths['loi'] = working_path(OEBPS, "loi.html")
+        componentizer.write_component(
+          Nokogiri::HTML.fragment(loi_html),
+          @component_paths['loi'],
+          &xhtmlize
+        )
+      end
 
       # cover.html
       @component_paths['cover-image'] = @component_paths['cover']
@@ -231,6 +242,11 @@ module Chook
               :type => "toc",
               :title => "Table of Contents",
               :href => "toc.html"
+            )
+            xml.reference(
+              :type => "loi",
+              :title => "List of Illustrations",
+              :href => "loi.html"
             )
           }
         }
@@ -311,15 +327,14 @@ module Chook
       end
 
 
-      def url_for_section(section)
-        sid = section.heading['id']  if section.heading
-        sid ||= section.node['id']  if section.node
-        sid = "#"+sid  if sid && !sid.empty?
+      def url_for_node(node)
+        return nil  unless node
 
-        n = section.node || section.heading
+        n = node
         while n && n.respond_to?(:parent)
           if cmptIndex = componentizer.components.index(n)
-            return "part#{cmptIndex+1}.html#{sid}"
+            fragment = "##{node['id']}"  if node['id'] && !node['id'].empty?
+            return "part#{cmptIndex+1}.html#{fragment}"
           end
           n = n.parent
         end

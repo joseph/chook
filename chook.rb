@@ -41,7 +41,10 @@ end
 post '/publish' do
   @ook = Chook::Ochook.from_zhook(
     params[:file][:tempfile].path,
-    { "public" => 4, "private" => 24 }[params[:security]]
+    {
+      :security => params[:security],
+      :id => params[:security] == "private" ? params[:id] : nil
+    }
   )
   if @ook.valid?
     redirect("/#{@ook.id}")

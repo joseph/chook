@@ -5,9 +5,9 @@
   <%= @ook.toc_html("/book/#{@ook.id}/") %>
 </div>
 
-<% if tof = @ook.tof_html("/book/#{@ook.id}/") %>
+<% if loi = @ook.loi_html("/book/#{@ook.id}/") %>
   <div>
-    <h2>List of Figures</h2>
-    <%= tof %>
+    <h2>List of Illustrations</h2>
+    <%= loi %>
   </div>
 <% end %>

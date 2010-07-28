@@ -9,9 +9,14 @@ module Chook
     attr_reader :invalidity
 
 
-    def self.from_zhook(path, id_length)
-      ook = new
-      ook.id = ook.find_unique_id(id_length)
+    def self.from_zhook(path, options)
+      if options[:id]
+        ook = from_id(options[:id])
+      else
+        ook = new
+        id_length = { "public" => 4, "private" => 24 }[options[:security]]
+        ook.id = ook.find_unique_id(id_length)
+      end
       ook.from_zhook(path)
       ook
     end
@@ -35,7 +40,16 @@ module Chook
     end
 
 
+    def private?
+      @id.length >= 24
+    end
+
+
     def from_zhook(path)
+      # Delete any zhook at that path (for re-publishing)
+      FileUtils.rm_rf(system_path)
+      FileUtils.rm_rf(pave('public', 'format', @id))
+
       FileUtils.mkdir_p(system_path)
       `unzip #{path} -d #{system_path}`
       raise "Not a zip file"  unless $?.success?
@@ -130,12 +144,13 @@ module Chook
     end
 
 
-    def tof_html(path = '')
+    def loi_html(path = '')
       out = nil
-      index_document.css('figure[id]').each { |fig|
-        next  unless caption = fig.at_css('figcaption')
+      index_document.css('figure[id], div.figure[id]').each { |fig|
+        next  unless caption = fig.at_css('figcaption, .figcaption')
+        p = block_given? ? yield(fig) : path+'#'+fig['id']
         out ||= "<ol>"
-        out << '<li><a href="'+path+'#'+fig['id']+'">'+caption.content+'</a></li>'
+        out << '<li><a href="'+p+'">'+caption.content+'</a></li>'
       }
       out ? out+"</ol>" : nil
     end

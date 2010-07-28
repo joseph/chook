@@ -22,7 +22,7 @@ module Chook
 
     def walk(node)
       return  unless component?(node)
-      @components.push(node.unlink)
+      @components.push(node)
       node.children.each { |c| walk(c) }
     end
 
@@ -47,23 +47,21 @@ module Chook
     end
 
 
-    def write_component(cmpt, path, &blk)
-      nodes = (cmpt && cmpt.name.downcase == "body") ? cmpt.children : cmpt
-      shell = generate_component(nodes)
+    def write_component(node, path, &blk)
+      shell = generate_component(node)
       out = block_given? ? blk.call(shell) : shell.to_html
       File.open(path, 'w') { |f| f.write(out) }
       out
     end
 
 
-    protected
-
-      def generate_component(nodes)
-        bdy = @shell.at_css('body')
-        bdy.children.remove
-        [nodes].flatten.compact.each { |node| bdy.add_child(node.dup) }
-        @shell
-      end
+    def generate_component(node)
+      nodes = (node && node.name.downcase == "body") ? node.children : node
+      bdy = @shell.at_css('body')
+      bdy.children.remove
+      [nodes].flatten.compact.each { |node| bdy.add_child(node.dup) }
+      @shell
+    end
 
   end
 
