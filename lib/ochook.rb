@@ -192,7 +192,15 @@ module Chook
         doc = index_document
         doc.at_css('html').set_attribute('manifest', 'ochook.manifest')
         File.open(system_path(@id, "index.html"), "w") { |f|
-          f.write(doc.to_html)
+          doc.write_to(
+            f,
+            :encoding => 'UTF-8',
+            :indent_text => ' ',
+            :indent => 2,
+            :save_with => Nokogiri::XML::Node::SaveOptions::AS_HTML |
+              Nokogiri::XML::Node::SaveOptions::FORMAT |
+              Nokogiri::XML::Node::SaveOptions::NO_DECLARATION
+          )
         }
       end
 

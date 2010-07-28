@@ -118,7 +118,8 @@ module Chook
           elem['class'] = "#{k.nil? || k.empty? ? '' : "#{k} " }#{elem.name}"
           elem.name = "div"
         }
-        root.remove_attribute('xmlns')
+        # FIXME? Seems to result in duplicate attributes in 2.7.6.
+        root.set_attribute('xmlns', "http://www.w3.org/1999/xhtml")
         "#{XHTML_DOCTYPE}\n#{root.to_xhtml}"
       }
 
@@ -304,7 +305,7 @@ module Chook
         }
         FileUtils.mkdir_p(File.dirname(path))
         File.open(path, 'w') { |f|
-          f.write(builder.to_xml(:encoding => 'UTF-8'))
+          builder.doc.write_xml_to(f, :encoding => 'UTF-8', :indent => 2)
         }
         path
       end

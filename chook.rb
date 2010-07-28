@@ -92,7 +92,7 @@ end
 get '/:book_id/format/:format' do
   halt(404)  unless %w[epub zhook].include?(params[:format])
   path = "/format/#{params[:book_id]}/#{params[:book_id]}.#{params[:format]}"
-  unless File.exists?("public#{path}")
+  unless File.exists?("public#{path}") && Sinatra::Application.environment != :development
     @id = params[:book_id]
     @ook = Chook::Ochook.from_id(@id)
     if params[:format].downcase == "epub"
