@@ -50,7 +50,7 @@ post '/publish' do
     redirect("/#{@ook.id}")
   else
     @ook.destroy
-    erb(:publish, :layout => false)
+    erb(:publish)
   end
 end
 
