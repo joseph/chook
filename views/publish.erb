@@ -1,25 +1,60 @@
 <% @page_title = "Zhook Publisher" %>
 
-<h2>Publish an Ochook</h2>
-<form action="/publish" method="POST" enctype="multipart/form-data">
-  <% if @ook && @ook.invalidity %>
-    <p class="warn">
-      <%= Rack::Utils.escape_html(@ook.invalidity.inspect) %>
-    </p>
-  <% end %>
-  <fieldset>
-    <legend>Upload a Zhook</legend>
-    <p>
+<div class="expl">
+  <p>
+    If you upload a Zhook ebook file here, you can:
+  </p>
+  <ul>
+    <li>test it in the reference Zhook reading system</li>
+    <li>preview the table of contents and list of illustrations</li>
+    <li>view the metadata table</li>
+    <li>download the <strong>EPUB</strong></li>
+  </ul>
+  <h2>What's a Zhook?</h2>
+  <p>
+    It's a designer-friendly ebook format. All you do is to zip up a
+    index.html file, along with any files it references. A Zhook book uses the
+    structure of your HTML itself to figure out the table of contents
+    and other things.
+  </p>
+  <p>
+    <strong>
+      Read much more about the Zhook format on
+      <a href="http://ochook.org">Ochook.org</a>.
+    </strong>
+  </p>
+</div>
+
+<div class="zhookPublish">
+  <form action="/publish" method="POST" enctype="multipart/form-data" class="zUp">
+    <% if @ook && @ook.invalidity %>
+      <p class="warn">
+        <%= Rack::Utils.escape_html(@ook.invalidity.inspect) %>
+      </p>
+    <% end %>
+    <fieldset>
+      <legend>Upload your file</legend>
+      <p>
+        Make sure you have given the file a <code>.zhook</code> extension,
+        and that it contains an <code>index.html</code>
+        and a <code>cover.png</code>.
+      </p>
       <input type="file" name="file" />
-    </p>
-    <p>
-      <select name="security">
-        <option value="private">Private</option>
-        <option value="public">Public</option>
-      </select>
-    </p>
-    <p>
-      <input type="submit" value="Publish" />
-    </p>
-  </fieldset>
-</form>
+      <p>
+        <em>Private</em> is a lengthy URL, making it very difficult to
+        stumble on — so you can re-upload to private URLs.
+        <em>Public</em> is a short URL, ideal for sharing.
+      </p>
+      <label>URL:
+        <select name="security">
+          <option value="private">Private</option>
+          <option value="public">Public</option>
+        </select>
+      </label>
+      <p>
+        <input type="submit" value="Publish &rarr;" class="zPubSubmit" />
+      </p>
+    </fieldset>
+  </form>
+</div>
+

@@ -1,49 +1,67 @@
 <% @page_title = "#{@ook.id}: #{h @ook.metadata('title')}"; @active = 1 %>
 
+<div class="expl">
+  <div id="zhookCover">
+    <a href="/<%= @ook.id %>/read">
+      <img src="/book/<%= @ook.id %>/cover.png" />
+    </a>
+  </div>
+
+  <div class="viewer viewZhook">
+    <a href="/<%= @ook.id %>/read">Zhook &rarr;</a>
+    <p>View the book in a simple Zhook Reading System.</p>
+  </div>
+
+  <div class="viewer viewOchook">
+    <a href="/book/<%= @ook.id %>/">Ochook &rarr;</a>
+    <p>
+      View the unadulterated <code>index.html</code>, with offline-caching
+      enabled.
+    </p>
+  </div>
+
+  <div class="viewer viewEPUB">
+    <a href="/<%= @ook.id %>/format/epub">EPUB &rarr;</a>
+    <p>
+      Convert to the open industry-standard ebook format, and download
+      it to your machine.
+    </p>
+  </div>
+
+  <!--
+  <div class="zhookDownloadLink">
+    <a href="/<%= @ook.id %>/format/zhook">Download Zhook</a>
+  </div>
+  -->
+</div>
+
 <% if @ook.private? %>
-  <div class="zhookRepublish">
-    <form action="/publish" method="POST" enctype="multipart/form-data">
+  <div class="zhookPublish">
+    <form action="/publish" method="POST" enctype="multipart/form-data" class="zUp">
       <% if @ook && @ook.invalidity %>
         <p class="warn">
           <%= Rack::Utils.escape_html(@ook.invalidity.inspect) %>
         </p>
       <% end %>
       <fieldset>
-        <legend>Made changes? Re-upload your Zhook</legend>
+        <legend>Made changes?</legend>
+        <p>
+          Make sure you have given the file a <code>.zhook</code> extension,
+          and that it contains an <code>index.html</code>
+          and a <code>cover.png</code>.
+        </p>
+        <input type="file" name="file" />
         <input type="hidden" name="id" value="<%= @ook.id %>" />
         <input type="hidden" name="security" value="private" />
-        <p>
-          <input type="file" name="file" />
-        </p>
-        <p>
-          <input type="submit" value="Publish" />
-        </p>
+        <input type="submit" value="Publish &rarr;" class="zPubSubmit" />
       </fieldset>
     </form>
   </div>
 <% end %>
 
 
-<div id="zhookCover">
-  <img src="/book/<%= @ook.id %>/cover.png" />
+<div class="expl" style="clear: both">
+  <p>
+    Tip: bookmark this page so you can find it again!
+  </p>
 </div>
-
-<div class="zhookReaderLink">
-  <a href="/<%= @ook.id %>/read">View in Zhook Reader</a>
-</div>
-
-<div class="ochookReaderLink">
-  <a href="/book/<%= @ook.id %>/">View as Ochook</a>
-</div>
-
-<div class="epubDownloadLink">
-  <a href="/<%= @ook.id %>/format/epub">Download EPUB</a>
-</div>
-
-<!--
-<div class="zhookDownloadLink">
-  <a href="/<%= @ook.id %>/format/zhook">Download Zhook</a>
-</div>
--->
-
-

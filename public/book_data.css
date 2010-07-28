@@ -4,6 +4,10 @@ body {
   font-family: Lucida Grande, Tahoma, Verdana, sans-serif;
 }
 
+a img {
+  border: none;
+}
+
 p.warn {
   background: #C55;
   color: white;
@@ -20,7 +24,7 @@ h1 {
 
 h1 a {
   padding: 0 10px;
-  color: #DDD;
+  color: #FC0;
   text-decoration: none;
   text-shadow: -2px -1px 0px #333;
 }
@@ -77,13 +81,30 @@ div#internals {
 
 
 /* BOOK INDEX */
-div.zhookRepublish {
-  float: right;
+div#zhookCover img {
+  width: 15em;
+  float: left;
+  margin-right: 1em;
+  border: 1px solid #333;
 }
 
-div#zhookCover img {
-  width: 200px;
+div.viewer {
+  margin: 0.3em 1em 2em;
 }
+
+div.viewer a {
+  background: #555;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 12px;
+  -moz-border-radius: 12px;
+  border: none;
+  margin-top: 2em;
+  pointer: cursor;
+  text-decoration: none;
+  font: 10pt Lucida Grande, Tahoma, Verdana, sans-serif;
+}
+
 
 
 /* CONTENTS */
@@ -136,4 +157,58 @@ pre#code {
   white-space: -moz-pre-wrap;
   white-space: -o-pre-wrap;
   word-wrap: break-word;
+}
+
+
+div.expl {
+  font: 12pt Georgia, serif;
+  width: 30em;
+  float: left;
+  padding-right: 2em;
+}
+
+div.zhookPublish {
+  float: left;
+  width: 20em;
+}
+
+
+form.zUp {
+  background: #FC0;
+  color: #111;
+  border-radius: 6px;
+  -moz-border-radius: 6px;
+  padding: 0.8em 0;
+}
+
+form.zUp p {
+  margin-top: 1em;
+  font-size: 8pt;
+}
+
+form.zUp fieldset {
+  border: none;
+  border-top: 1px solid #FFF;
+}
+
+form.zUp fieldset legend {
+  color: #111;
+  font-size: 8pt;
+  font-weight: bold;
+}
+
+input.zPubSubmit {
+  background: #555;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 12px;
+  -moz-border-radius: 12px;
+  border: none;
+  margin-top: 2em;
+  pointer: cursor;
+}
+
+form.zUp label {
+  font-weight: bold;
+  font-size: 10pt;
 }
