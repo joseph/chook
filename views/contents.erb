@@ -1,12 +1,12 @@
-<% @page_title = "Contents: #{@ook.id}" %>
+<% @page_title = "Contents: #{@ook.id}"; @active = 2 %>
 
-<div>
+<div class="toc">
   <h2>Table of Contents</h2>
   <%= @ook.toc_html("/book/#{@ook.id}/") %>
 </div>
 
 <% if loi = @ook.loi_html("/book/#{@ook.id}/") %>
-  <div>
+  <div class="toc">
     <h2>List of Illustrations</h2>
     <%= loi %>
   </div>

@@ -1,13 +1,107 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Lucida Grande, Tahoma, Verdana, sans-serif;
+}
+
 p.warn {
   background: #C55;
   color: white;
   padding: 0.5em 1em;
 }
 
+h1 {
+  background: #676767;
+  margin: 0;
+  padding: 0.5em 0;
+  font-family: Futura, Tahoma, sans-serif;
+}
+
+h1 a {
+  padding: 0 10px;
+  color: #DDD;
+  text-decoration: none;
+  text-shadow: -2px -1px 0px #333;
+}
+
+ul#toolbar {
+  margin: 0;
+  padding: 10px 0 0 10px;
+  overflow: hidden;
+  list-style: none;
+  background-color: #777;
+}
+
+ul#toolbar li {
+  float: left;
+  margin: 0 3px 0 0;
+}
+
+ul#toolbar a {
+  display: block;
+  margin-top: 0.5em;
+  padding: 0.5em 0.5em 0.3em;
+  background: #EEE;
+  border: 2px solid white;
+  border-bottom: 1px solid #DDD;
+  box-shadow: 0 -1px 2px #333;
+  -webkit-box-shadow: 0 -1px 2px #333;
+  -moz-box-shadow: 0 -1px 2px #333;
+  -webkit-border-top-left-radius: 10px;
+  -webkit-border-top-right-radius: 10px;
+  -moz-border-radius-topleft: 10px;
+  -moz-border-radius-topright: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  text-decoration: none;
+  color: #333;
+}
+
+ul#toolbar a.mainTool {
+  padding-top: 1em;
+  margin-top: 0;
+  font-weight: bold;
+}
+
+ul#toolbar a.active {
+  background: white;
+  color: #000;
+  border-bottom: 1px solid white;
+}
+
+div#internals {
+  margin-top: 1px;
+  padding: 1em;
+}
+
+
+/* BOOK INDEX */
+div.zhookRepublish {
+  float: right;
+}
+
+div#zhookCover img {
+  width: 200px;
+}
+
+
+/* CONTENTS */
+.toc ol {
+  padding-left: 1em;
+  counter-reset: item;
+}
+.toc ol li {
+  display: block;
+}
+.toc ol li:before {
+  content: counters(item, ".") " ";
+  counter-increment: item;
+}
+
+
 /* METADATA */
 table.meta {
   border-collapse: collapse;
-  font: 9pt Lucide Grande, Tahoma, Verdana, sans-serif;
 }
 
 table.meta th, table.meta td {
@@ -34,4 +128,11 @@ textarea#code {
   position: absolute;
   width: 80%;
   height: 98%;
+}
+
+pre#code {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
 }

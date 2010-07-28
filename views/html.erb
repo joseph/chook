@@ -1,4 +1,7 @@
-<% @page_title = "Edit HTML: #{@ook.id}" %>
+<% @page_title = "Edit HTML: #{@ook.id}"; @active = 4 %>
 
-<textarea id="code"><%= @ook.index_document.to_html %></textarea>
-
+<% if false and @ook.private? %>
+  <textarea id="code"><%= h @content %></textarea>
+<% else %>
+  <pre id="code"><%= h @content %></pre>
+<% end %>

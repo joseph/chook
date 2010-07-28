@@ -76,7 +76,7 @@ module Chook
     def build_ncx
       x = 0
       curse = lambda { |xml, section|
-        if cmpt = url_for_node(section.heading || section.node)
+        if cmpt = url_for_node(section.heading, section.node)
           xml.navPoint(:id => "navPoint#{x+=1}", :playOrder => x) {
             xml.navLabel { xml.text_(section.heading_text) }
             xml.content(:src => cmpt)
@@ -147,7 +147,7 @@ module Chook
       outline_html = outliner.to_html { |section, below|
         heading = section.heading_text
         if heading
-          url = url_for_node(section.heading || section.node)
+          url = url_for_node(section.heading, section.node)
           heading = '<a href="'+url+'">'+heading+'</a>'
         elsif section.respond_to?(:container) && section.container && !below.empty?
           heading = '<br class="anon" />'
@@ -327,7 +327,9 @@ module Chook
       end
 
 
-      def url_for_node(node)
+      def url_for_node(*nodes)
+        node = nodes.compact.detect { |n| n['id'] && !n['id'].empty? }
+        node ||= nodes.first
         return nil  unless node
 
         n = node

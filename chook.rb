@@ -33,8 +33,8 @@ end
 # UPLOADING
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-get '/publish' do
-  erb :publish, :layout => false
+get '/' do
+  erb :publish
 end
 
 
@@ -129,7 +129,9 @@ end
 # Viewing and editing the HTML.
 #
 get '/:book_id/html' do
-  book_action(:html)
+  book_action(:html) {
+    @content = IO.read(@ook.system_path(@ook.id, 'index.html'))
+  }
 end
 
 

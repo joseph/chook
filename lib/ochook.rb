@@ -125,7 +125,8 @@ module Chook
 
     def toc_html(path = '')
       link_to_section = lambda { |sxn, heading|
-        sid = sxn.heading['id'] || sxn.node['id']
+        sid = sxn.heading['id']  if sxn.heading
+        sid ||= sxn.node['id']  if sxn.node
         return heading  unless sid && !sid.empty?
         '<a href="'+path+'#'+sid+'">'+heading+'</a>'
       }

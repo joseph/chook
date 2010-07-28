@@ -7,14 +7,20 @@
   </head>
   <body>
 
-    <ul>
-      <li><a href="/<%= @ook.id %>"><%= h @ook.metadata('title') %></a></li>
-      <li><a href="/<%= @ook.id %>/contents">Contents</a></li>
-      <li><a href="/<%= @ook.id %>/metadata">Metadata</a></li>
-      <li><a href="/<%= @ook.id %>/html">HTML</a></li>
-    </ul>
+    <h1><a href="/">Zhook Publisher</a></h1>
 
-    <%= yield %>
+    <% if @ook %>
+      <ul id="toolbar">
+        <li><a class="mainTool <%= "active" if @active == 1 %>" href="/<%= @ook.id %>"><%= h @ook.metadata('title') %></a></li>
+        <li><a class="<%= "active" if @active == 2 %>" href="/<%= @ook.id %>/contents">Contents</a></li>
+        <li><a class="<%= "active" if @active == 3 %>" href="/<%= @ook.id %>/metadata">Metadata</a></li>
+        <li><a class="<%= "active" if @active == 4 %>" href="/<%= @ook.id %>/html">HTML</a></li>
+      </ul>
+    <% end %>
+
+    <div id="internals">
+      <%= yield %>
+    </div>
 
   </body>
 </html>
