@@ -36,7 +36,7 @@ module Chook
         raise "Not a heading: #{el.inspect}"  unless heading?(el)
         if named?(el, 'HGROUP')
           1.upto(6) { |n| return n  if el.at_css("h#{n}") }
-          raise "Heading not found in HGROUP: #{el.inspect}" # FIXME: how to handle?
+          return 6 #raise "Heading not found in HGROUP: #{el.inspect}"
         else
           el.name.reverse.to_i
         end
@@ -79,7 +79,8 @@ module Chook
         return nil  unless Utils.heading?(heading)
         h = heading
         h = h.at_css("h#{Utils.heading_rank(h)}")  if Utils.named?(h, 'HGROUP')
-        (h && !h.content.strip.empty?) ? h.content.strip : nil
+        return  nil  unless h && !h.content.strip.empty?
+        h.content.strip
       end
 
 

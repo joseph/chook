@@ -120,7 +120,7 @@ module Chook
         }
         # FIXME? Seems to result in duplicate attributes in 2.7.6.
         root.set_attribute('xmlns', "http://www.w3.org/1999/xhtml")
-        "#{XHTML_DOCTYPE}\n#{root.to_xhtml}"
+        "#{XHTML_DOCTYPE}\n#{root.to_xhtml(:indent => 2)}"
       }
 
       # non-components (stylesheets, images, etc)
