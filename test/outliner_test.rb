@@ -37,8 +37,9 @@ class Chook::OutlinerTest < Test::Unit::TestCase
     src_file = File.new("test/fixtures/#{spec_name}.doc.html")
     cmp_file = File.new("test/fixtures/#{spec_name}.out.html")
     doc = Nokogiri::HTML::Document.parse(src_file)
-    outline = Chook::Outliner.new(doc.root)
-    out = outline.to_html(to_html_options).gsub(/\s+/, '')
+    outliner = Chook::Outliner.new(doc.root)
+    outliner.process(doc.root)
+    out = outliner.to_html(to_html_options).gsub(/\s+/, '')
     cmp = cmp_file.read.gsub(/\s+/, '')
     assert_equal(cmp, out)
   end

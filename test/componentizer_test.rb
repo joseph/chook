@@ -39,7 +39,8 @@ class Chook::ComponentizerTest < Test::Unit::TestCase
   def componentize_fixture(fixture_path)
     fixture = File.new("test/fixtures/#{fixture_path}")
     doc = Nokogiri::HTML::Document.parse(fixture)
-    Chook::Componentizer.new(doc.root)
+    cz = Chook::Componentizer.new(doc)
+    cz.process(doc.root)
   end
 
 end

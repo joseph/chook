@@ -161,15 +161,15 @@ module Chook
         &xhtmlize
       )
 
-      # loi.html
-      if loi_html = @ochook.loi_html { |fig| url_for_node(fig) }
-        @component_paths['loi'] = working_path(OEBPS, "loi.html")
-        componentizer.write_component(
-          Nokogiri::HTML.fragment(loi_html),
-          @component_paths['loi'],
-          &xhtmlize
-        )
-      end
+      # # loi.html
+      # if loi_html = @ochook.loi_html { |fig| url_for_node(fig) }
+      #   @component_paths['loi'] = working_path(OEBPS, "loi.html")
+      #   componentizer.write_component(
+      #     Nokogiri::HTML.fragment(loi_html),
+      #     @component_paths['loi'],
+      #     &xhtmlize
+      #   )
+      # end
 
       # cover.html
       @component_paths['cover-image'] = @component_paths['cover']
@@ -244,11 +244,11 @@ module Chook
               :title => "Table of Contents",
               :href => "toc.html"
             )
-            xml.reference(
-              :type => "loi",
-              :title => "List of Illustrations",
-              :href => "loi.html"
-            )
+            # xml.reference(
+            #   :type => "loi",
+            #   :title => "List of Illustrations",
+            #   :href => "loi.html"
+            # )
           }
         }
       }

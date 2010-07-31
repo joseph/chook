@@ -22,7 +22,7 @@ module Chook
 
     def walk(node)
       return  unless component?(node)
-      @components.push(node)
+      @components.push(node.unlink)
       node.children.each { |c| walk(c) }
     end
 

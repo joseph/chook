@@ -27,9 +27,9 @@ function read() {
   var cover = $('cover');
   var nav = $('nav');
   var frame = $('reader');
-  cover.style.display = "none";
-  nav.style.display = "block";
   frame.style.visibility = "visible";
+  nav.style.display = "block";
+  cover.style.display = "none";
   applyTOC(frame);
 }
 
